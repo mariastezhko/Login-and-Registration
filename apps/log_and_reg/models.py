@@ -6,7 +6,8 @@ EMAIL_REGEX = re.compile(r'^[a-zA-Z0-9.+_-]+@[a-zA-Z0-9._-]+\.[a-zA-Z]+$')
 class UserManager(models.Manager):
     def basic_validator(self, postData):
         errors = {}
-        if (len(postData['first_name']) < 1) or (len(postData['last_name']) < 1) or (len(postData['email']) < 1):
+        if (len(postData['first_name']) < 1) or (len(postData['last_name'])
+                < 1) or (len(postData['email']) < 1):
             errors["blank"] = "All fields are required and must not be blank!"
         if not (postData['first_name'].isalpha() and postData['last_name'].isalpha()):
             errors["alpha"] = "First and Last Name cannot contain any numbers!"
@@ -25,4 +26,6 @@ class User(models.Model):
     objects = UserManager()
 
     def __unicode__(self):
-        return "id: " + str(self.id) + ", first_name: " + self.first_name + ", last_name: " + self.last_name + ", email: " + self.email + ", password: " + self.password
+        return "id: " + str(self.id) + ", first_name: " + self.first_name + \
+        ", last_name: " + self.last_name + ", email: " + self.email + \
+        ", password: " + self.password
