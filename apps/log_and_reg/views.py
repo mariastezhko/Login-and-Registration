@@ -18,24 +18,26 @@ def success(request):
         return redirect('/')
 
 def processRegistration(request):
-    print("************")
     errors = User.objects.basic_validator(request.POST)
     if len(errors):
         for error in errors:
             messages.error(request, errors[error])
         return redirect('/')
     else:
-        first_name = request.POST['first_name']
-        last_name = request.POST['last_name']
         email = request.POST['email']
-        password = bcrypt.hashpw(request.POST['password'].encode(), bcrypt.gensalt())
-        print email
-        User.objects.create(first_name = first_name, last_name = last_name, email = email, password = password)
-        this_user = User.objects.get(email=email)
-        # user id in session
-        request.session['user_id'] = this_user.id
-        errors["success"] = "Successfully registered (or logged in)!"
-        return redirect('/success')
+        try:
+            User.objects.get(email=email)
+            messages.error(request, "A user with this email already exists")
+            return redirect('/')
+        except:
+            first_name = request.POST['first_name']
+            last_name = request.POST['last_name']
+            password = bcrypt.hashpw(request.POST['password'].encode(), bcrypt.gensalt())
+            print email
+            this_user = User.objects.create(first_name = first_name, last_name = last_name, email = email, password = password)
+            request.session['user_id'] = this_user.id
+            errors["success"] = "Successfully registered (or logged in)!"
+            return redirect('/success')
 
 def processLogin(request):
     email = request.POST['email']
@@ -59,5 +61,6 @@ def processLogin(request):
 
 def logout(request):
     request.session['user_id'] = None
+    messages.error(request, "You have successfully logged out")
     print "Logged out"
     return redirect('/')
